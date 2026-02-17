@@ -1,19 +1,2 @@
-### 🛠 Tech Stack
-- **Frontend:** React, Next.js, TypeScript  
-- **Backend:** Node.js, Express, Prisma  
-- **Database:** MySQL
-
----
-
-### 🎓 Certifications
-- 정보처리기사 (Engineer Information Processing)
-- JLPT N1 (Japanese Language Proficiency Test)
-
----
-
-### 💼 Experience
-- 플랫폼 개발팀 @ [워크와이즈] (2025.02 ~ )
-
----
-
-📫 **Contact:** [dyden119@gmail.com]
+![IMG_0103](https://github.com/user-attachments/assets/6c07a53a-adb3-430f-af1a-8a692a382476)
+산이 좋다.
