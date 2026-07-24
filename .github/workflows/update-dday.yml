@@ -15,22 +15,42 @@ jobs:
 
       - name: Calculate D-Day & Update README
         run: |
-          # 1. 일본 입국/시작 날짜 설정 (YYYY-MM-DD 형식으로 지정)
-          # 예: 2026년 7월 25일이 D+1(첫날) 시작이라면 해당 날짜 입력
           START_DATE="2026-07-29"
           
-          # 2. 오늘 날짜와 시작 날짜의 차이 계산 (일 수)
-          CURRENT_DATE=$(date +%Y-%m-%d)
+          CURRENT_SEC=$(date -d "$(date +%Y-%m-%d)" +%s)
           START_SEC=$(date -d "$START_DATE" +%s)
-          CURRENT_SEC=$(date -d "$CURRENT_DATE" +%s)
           
-          DIFF_DAYS=$(( (CURRENT_SEC - START_SEC) / 86400 + 1 ))
+          # 일 수 차이 계산
+          DIFF_DAYS=$(( (CURRENT_SEC - START_SEC) / 86400 ))
           
-          # 3. 대체할 텍스트 생성
-          NEW_TEXT="**D+${DIFF_DAYS}**"
+          if [ $DIFF_DAYS -lt 0 ]; then
+            # 시작일 전 (예: D-5)
+            NEW_TEXT="**D${DIFF_DAYS}**"
+          elif [ $DIFF_DAYS -eq 0 ]; then
+            # 시작일 당일 (D-Day 또는 D+1)
+            NEW_TEXT="**D-Day (D+1)**"
+          else
+            # 시작일 이후 (D+2, D+3 ...)
+            DAY_NUM=$(( DIFF_DAYS + 1 ))
+            NEW_TEXT="**D+${DAY_NUM}**"
+          fi
           
-          # 4. README.md 파일 내의 주석 태그 사이 내용을 자동 교체
-          sed -i "/<!-- dday-start -->/,/<!-- dday-end -->/c\<!-- dday-start -->\n${NEW_TEXT}\n<!-- dday-end -->" README.md
+          echo "Calculated D-Day: $NEW_TEXT"
+          
+          # python을 활용해 줄바꿈 및 태그 사이 내용 안전하게 교체
+          python3 -c "
+          with open('README.md', 'r', encoding='utf-8') as f:
+              content = f.read()
+          
+          import re
+          pattern = r'<!-- dday-start -->.*?<!-- dday-end -->'
+          replacement = f'<!-- dday-start -->\n{'$NEW_TEXT'}\n<!-- dday-end -->'
+          
+          new_content = re.sub(pattern, replacement, content, flags=re.DOTALL)
+          
+          with open('README.md', 'w', encoding='utf-8') as f:
+              f.write(new_content)
+          "
 
       - name: Commit & Push Changes
         run: |
